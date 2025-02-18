@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rotate Circle Lottery Tool </title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+        #wheel {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            position: relative;
+            border: 10px solid #fff;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .section {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(50% 50%, 100% 0, 100% 100%);
+            transform-origin: center;
+        }
+        #spinBtn, #resetHistory {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        #spinBtn {
+            background-color: #4CAF50;
+        }
+        #spinBtn:hover {
+            background-color: #45a049;
+        }
+        #resetHistory {
+            background-color: #ff4d4d;
+        }
+        #resetHistory:hover {
+            background-color: #e60000;
+        }
+        #resultModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            text-align: center;
+            border-radius: 10px;
+        }
+        #closeModal {
+            margin-top: 10px;
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background-color: #ff4d4d;
+            color: white;
+            border-radius: 5px;
+        }
+        #history {
+            margin-top: 20px;
+            width: 300px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Rotate Circle Lottery Tool with Suraj (STM)</h1>
+    <div id="wheel"></div>
+    <button id="spinBtn">Spin</button>
+    <button id="resetHistory">Reset History</button>
+    
+    <div id="resultModal">
+        <h2 id="winnerText"></h2>
+        <button id="closeModal">Close</button>
+    </div>
+
+    <div id="history">
+        <h3>Spin History</h3>
+        <ul id="historyList"></ul>
+    </div>
+
+    <script>
+        const wheel = document.getElementById('wheel');
+        const spinBtn = document.getElementById('spinBtn');
+        const resultModal = document.getElementById('resultModal');
+        const winnerText = document.getElementById('winnerText');
+        const closeModal = document.getElementById('closeModal');
+        const historyList = document.getElementById('historyList');
+        const resetHistory = document.getElementById('resetHistory');
+
+        const sections = ["Prize 1", "Prize 2", "Prize 3", "Prize 4", "Prize 5", "Prize 6"];
+        const colors = ["#FF5733", "#FFC300", "#FF33FF", "#33FF57", "#3380FF", "#FF8333"];
+
+        // Create wheel sections dynamically
+        sections.forEach((section, i) => {
+            const sectionDiv = document.createElement('div');
+            sectionDiv.classList.add('section');
+            sectionDiv.style.backgroundColor = colors[i % colors.length];
+            sectionDiv.style.transform = `rotate(${i * (360 / sections.length)}deg)`;
+            sectionDiv.style.clipPath = `polygon(50% 50%, 100% 0, 100% 100%)`;
+            sectionDiv.innerText = section;
+            sectionDiv.style.color = "white";
+            sectionDiv.style.display = "flex";
+            sectionDiv.style.alignItems = "center";
+            sectionDiv.style.justifyContent = "center";
+            sectionDiv.style.position = "absolute";
+            sectionDiv.style.width = "100%";
+            sectionDiv.style.height = "100%";
+            sectionDiv.style.transformOrigin = "center";
+            wheel.appendChild(sectionDiv);
+        });
+
+        let spinning = false;
+
+        spinBtn.addEventListener('click', () => {
+            if (spinning) return;
+            spinning = true;
+            const spinDegrees = Math.floor(Math.random() * 360) + 720; // Minimum 2 full spins
+            wheel.style.transition = 'transform 4s cubic-bezier(0.17, 0.67, 0.83, 0.67)';
+            wheel.style.transform = `rotate(${spinDegrees}deg)`;
+
+            setTimeout(() => {
+                const actualDegrees = spinDegrees % 360;
+                const sectionSize = 360 / sections.length;
+                const index = Math.floor((360 - actualDegrees) / sectionSize) % sections.length;
+                const prize = sections[index];
+                winnerText.innerText = `You won: ${prize}`;
+                resultModal.style.display = 'block';
+
+                // Add to history
+                const historyItem = document.createElement('li');
+                historyItem.innerText = prize;
+                historyList.appendChild(historyItem);
+
+                spinning = false;
+            }, 4000);
+        });
+
+        closeModal.addEventListener('click', () => {
+            resultModal.style.display = 'none';
+        });
+
+        resetHistory.addEventListener('click', () => {
+            historyList.innerHTML = ''; // Clear the history
+        });
+    </script>
+</body>
+</html>
